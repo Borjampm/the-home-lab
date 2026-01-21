@@ -1,0 +1,43 @@
+{
+  "investigation": "lightweight-desktop-frameworks",
+  "created": "2026-01-20T00:00:00Z",
+  "status": "active",
+  "tasks": [
+    {
+      "id": "r1",
+      "title": "Rust-Based Desktop Frameworks Deep Dive",
+      "status": "in-progress",
+      "file": "reports/r1-rust-frameworks.md",
+      "novel_info_pct": null,
+      "assigned_at": "2026-01-21T02:23:29Z",
+      "completed_at": null
+    },
+    {
+      "id": "r2",
+      "title": "Go-Based and Native Framework Alternatives",
+      "status": "in-progress",
+      "file": "reports/r2-go-native-frameworks.md",
+      "novel_info_pct": null,
+      "assigned_at": "2026-01-21T02:23:29Z",
+      "completed_at": null
+    },
+    {
+      "id": "r3",
+      "title": "Modern Cross-Platform Frameworks",
+      "status": "pending",
+      "file": "reports/r3-cross-platform-frameworks.md",
+      "novel_info_pct": null,
+      "assigned_at": null,
+      "completed_at": null
+    },
+    {
+      "id": "r4",
+      "title": "Performance Benchmarks and Recommendations",
+      "status": "pending",
+      "file": "reports/r4-benchmarks-recommendations.md",
+      "novel_info_pct": null,
+      "assigned_at": null,
+      "completed_at": null
+    }
+  ]
+}
