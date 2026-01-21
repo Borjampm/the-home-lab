@@ -6,29 +6,29 @@
     {
       "id": "r1",
       "title": "Rust-Based Desktop Frameworks Deep Dive",
-      "status": "in-progress",
+      "status": "complete",
       "file": "reports/r1-rust-frameworks.md",
-      "novel_info_pct": null,
+      "novel_info_pct": 85,
       "assigned_at": "2026-01-21T02:23:29Z",
-      "completed_at": null
+      "completed_at": "2026-01-21T03:45:00Z"
     },
     {
       "id": "r2",
       "title": "Go-Based and Native Framework Alternatives",
-      "status": "in-progress",
-      "file": "reports/r2-go-native-frameworks.md",
-      "novel_info_pct": null,
+      "status": "complete",
+      "file": "reports/r2-go-frameworks.md",
+      "novel_info_pct": 85,
       "assigned_at": "2026-01-21T02:23:29Z",
-      "completed_at": null
+      "completed_at": "2026-01-21T03:15:00Z"
     },
     {
       "id": "r3",
       "title": "Modern Cross-Platform Frameworks",
-      "status": "pending",
-      "file": "reports/r3-cross-platform-frameworks.md",
-      "novel_info_pct": null,
-      "assigned_at": null,
-      "completed_at": null
+      "status": "complete",
+      "file": "reports/r3-crossplatform-frameworks.md",
+      "novel_info_pct": 90,
+      "assigned_at": "2026-01-20T10:00:00Z",
+      "completed_at": "2026-01-20T12:30:00Z"
     },
     {
       "id": "r4",
