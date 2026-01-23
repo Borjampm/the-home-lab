@@ -1,7 +1,8 @@
-# The Home Lab
+# The Home Lab — App
 
-A place to build a personal home lab, connect computers and other utilities.
+Control Center: a desktop terminal application for managing the home lab. Built with Tauri 2, SvelteKit, and xterm.js.
 
 ## Index
 
 - [Documentation](docs/README.md)
+- [Control Center](control-center/) — The Tauri desktop application
