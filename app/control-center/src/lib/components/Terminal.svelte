@@ -1,10 +1,14 @@
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte';
   import { invoke, Channel } from '@tauri-apps/api/core';
+  import { getCurrentWindow } from '@tauri-apps/api/window';
   import { Terminal } from '@xterm/xterm';
   import { FitAddon } from '@xterm/addon-fit';
   import { WebglAddon } from '@xterm/addon-webgl';
   import '@xterm/xterm/css/xterm.css';
+
+  export let terminalId: string;
+  export let command: string | undefined = undefined;
 
   let terminalEl: HTMLDivElement;
   let term: Terminal;
@@ -46,12 +50,17 @@
       if (msg.event === 'exit') term.write('\r\n[Process exited]\r\n');
     };
 
-    await invoke('spawn_shell', { onData, rows: term.rows, cols: term.cols });
+    await invoke('spawn_shell', { onData, rows: term.rows, cols: term.cols, terminalId, command: command ?? null });
 
-    term.onData((data) => invoke('write_to_pty', { data }));
-    term.onResize(({ rows, cols }) => invoke('resize_pty', { rows, cols }));
+    term.onData((data) => invoke('write_to_pty', { data, terminalId }));
+    term.onResize(({ rows, cols }) => invoke('resize_pty', { rows, cols, terminalId }));
 
     window.addEventListener('resize', handleResize);
+
+    const currentWindow = getCurrentWindow();
+    currentWindow.onCloseRequested(() => {
+      invoke('kill_pty', { terminalId }).catch(() => {});
+    });
   });
 
   function handleResize() {
@@ -60,6 +69,7 @@
 
   onDestroy(() => {
     window.removeEventListener('resize', handleResize);
+    invoke('kill_pty', { terminalId }).catch(() => {});
     term?.dispose();
   });
 </script>

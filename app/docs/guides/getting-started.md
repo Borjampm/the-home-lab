@@ -117,5 +117,5 @@ If you encounter errors related to `portable-pty`, ensure you're on a supported 
 
 ## Next Steps
 
-- Read [architecture.md](architecture.md) to understand the high-level system design
-- Explore [components/](components/) for detailed documentation on the Terminal and Tailscale integrations
+- Read [architecture.md](../architecture.md) to understand the high-level system design
+- Explore [components/](../components/) for detailed documentation on the Terminal and Tailscale integrations

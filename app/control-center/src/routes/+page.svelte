@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { invoke } from '@tauri-apps/api/core';
-  import Terminal from '$lib/components/Terminal.svelte';
+  import { WebviewWindow } from '@tauri-apps/api/webviewWindow';
 
   interface TailscaleDevice {
     hostname: string;
@@ -20,11 +20,38 @@
     error: string | null;
   }
 
-  let showTerminal = false;
   let status: TailscaleStatus | null = null;
   let loading = true;
-
   let toggling = false;
+
+  function openTerminal() {
+    const label = `terminal-${Date.now()}`;
+    new WebviewWindow(label, {
+      url: `/terminal?id=${label}`,
+      title: 'Terminal',
+      width: 800,
+      height: 500,
+      resizable: true,
+      center: true,
+    });
+  }
+
+  function takeControl(device: TailscaleDevice) {
+    const label = `terminal-${Date.now()}`;
+    let url = `/terminal?id=${label}`;
+    if (!device.isSelf) {
+      const cmd = `ssh ${device.ips[0]}`;
+      url += `&cmd=${encodeURIComponent(cmd)}`;
+    }
+    new WebviewWindow(label, {
+      url,
+      title: device.hostname,
+      width: 800,
+      height: 500,
+      resizable: true,
+      center: true,
+    });
+  }
 
   async function toggleTailscale() {
     if (!status) return;
@@ -58,73 +85,69 @@
 </script>
 
 <main>
-  {#if showTerminal}
-    <div class="terminal-view">
-      <button class="back-btn" on:click={() => showTerminal = false}>
-        &larr; Dashboard
-      </button>
-      <Terminal />
-    </div>
-  {:else}
-    <div class="dashboard">
-      <header>
-        <h1>Control Center</h1>
-        <div class="actions">
-          <button class="btn" on:click={fetchStatus} disabled={loading}>
-            {loading ? 'Loading...' : 'Refresh'}
-          </button>
-          <button class="btn btn-primary" on:click={() => showTerminal = true}>
-            Terminal
-          </button>
-        </div>
-      </header>
+  <div class="dashboard">
+    <header>
+      <h1>Control Center</h1>
+      <div class="actions">
+        <button class="btn" on:click={fetchStatus} disabled={loading}>
+          {loading ? 'Loading...' : 'Refresh'}
+        </button>
+        <button class="btn btn-primary" on:click={openTerminal}>
+          Terminal
+        </button>
+      </div>
+    </header>
 
-      {#if status?.error}
-        <div class="error">
-          <strong>Error:</strong> {status.error}
-        </div>
-      {/if}
+    {#if status?.error}
+      <div class="error">
+        <strong>Error:</strong> {status.error}
+      </div>
+    {/if}
 
-      {#if loading && !status}
-        <p class="loading-text">Fetching Tailscale status...</p>
-      {:else if status}
-        <div class="status-bar">
-          <span class="status-indicator" class:online={status.connected}></span>
-          Tailscale: {status.connected ? 'Connected' : 'Disconnected'}
-          <button
-            class="btn btn-toggle"
-            class:btn-danger={status.connected}
-            on:click={toggleTailscale}
-            disabled={toggling}
-          >
-            {toggling ? '...' : status.connected ? 'Disconnect' : 'Connect'}
-          </button>
-          <span class="device-count">{status.devices.length} devices</span>
-        </div>
+    {#if loading && !status}
+      <p class="loading-text">Fetching Tailscale status...</p>
+    {:else if status}
+      <div class="status-bar">
+        <span class="status-indicator" class:online={status.connected}></span>
+        Tailscale: {status.connected ? 'Connected' : 'Disconnected'}
+        <button
+          class="btn btn-toggle"
+          class:btn-danger={status.connected}
+          on:click={toggleTailscale}
+          disabled={toggling}
+        >
+          {toggling ? '...' : status.connected ? 'Disconnect' : 'Connect'}
+        </button>
+        <span class="device-count">{status.devices.length} devices</span>
+      </div>
 
-        <div class="device-list">
-          {#each status.devices as device}
-            <div class="device-card" class:self={device.isSelf}>
-              <div class="device-header">
-                <span class="status-dot" class:online={device.online}></span>
-                <span class="hostname">
-                  {device.hostname}
-                  {#if device.isSelf}<span class="self-badge">self</span>{/if}
-                </span>
-                <span class="os">{device.os}</span>
-              </div>
-              <div class="device-details">
-                <span class="ips">{device.ips.join(', ')}</span>
-                {#if device.relay}
-                  <span class="relay">relay: {device.relay}</span>
-                {/if}
-              </div>
+      <div class="device-list">
+        {#each status.devices as device}
+          <div class="device-card" class:self={device.isSelf}>
+            <div class="device-header">
+              <span class="status-dot" class:online={device.online}></span>
+              <span class="hostname">
+                {device.hostname}
+                {#if device.isSelf}<span class="self-badge">self</span>{/if}
+              </span>
+              <span class="os">{device.os}</span>
             </div>
-          {/each}
-        </div>
-      {/if}
-    </div>
-  {/if}
+            <div class="device-details">
+              <span class="ips">{device.ips.join(', ')}</span>
+              {#if device.relay}
+                <span class="relay">relay: {device.relay}</span>
+              {/if}
+              {#if device.online}
+                <button class="btn btn-control" on:click={() => takeControl(device)}>
+                  Take control
+                </button>
+              {/if}
+            </div>
+          </div>
+        {/each}
+      </div>
+    {/if}
+  </div>
 </main>
 
 <style>
@@ -141,26 +164,6 @@
     width: 100vw;
     height: 100vh;
     display: flex;
-  }
-
-  .terminal-view {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-  }
-
-  .back-btn {
-    background: #313244;
-    color: #cdd6f4;
-    border: none;
-    padding: 6px 12px;
-    cursor: pointer;
-    font-family: inherit;
-    font-size: 12px;
-  }
-
-  .back-btn:hover {
-    background: #45475a;
   }
 
   .dashboard {
@@ -348,5 +351,19 @@
 
   .relay {
     color: #6c7086;
+  }
+
+  .btn-control {
+    margin-left: auto;
+    padding: 2px 8px;
+    font-size: 11px;
+    background: #a6e3a1;
+    color: #1e1e2e;
+    border-color: #a6e3a1;
+  }
+
+  .btn-control:hover {
+    background: #94e2d5;
+    border-color: #94e2d5;
   }
 </style>
