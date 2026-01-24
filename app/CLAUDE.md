@@ -13,8 +13,8 @@ The parent repository (`the-home-lab/`) contains:
 - `research/` — Research agents and reports (has its own CLAUDE.md with research methodology guidelines)
 
 The application lives in `control-center/`:
-- `control-center/src/` — SvelteKit frontend (xterm.js terminal UI)
-- `control-center/src-tauri/` — Rust backend (PTY management, Tauri commands)
+- `control-center/src/` — SvelteKit frontend (dashboard + terminal)
+- `control-center/src-tauri/` — Rust backend (Tauri commands)
 
 ## Tech Stack
 
@@ -27,11 +27,7 @@ Target platforms: **macOS and Linux only** (no Windows support).
 
 ## Architecture
 
-The app spawns a PTY (pseudo-terminal) on the Rust side and streams data to xterm.js via Tauri IPC channels:
-
-- `spawn_shell` — Creates a PTY, spawns the user's `$SHELL`, streams output via `Channel<PtyEvent>`
-- `write_to_pty` — Forwards user keystrokes from xterm.js to the PTY master
-- `resize_pty` — Syncs terminal dimensions when the window resizes
+PTY-based terminal (Rust → xterm.js via Tauri IPC). Tailscale network management via CLI. See `docs/` for detailed architecture notes.
 
 ## Commands
 
@@ -56,7 +52,16 @@ Documentation uses an index-based architecture:
 - Each README includes a brief description of what the folder contains
 - Subdirectories follow the same pattern with their own `README.md`
 
+Documentation should be **high-level**: explain main components, the logic behind how systems are designed, why they were designed that way, and how to use them. Avoid focusing on code-level details — the code speaks for itself.
+
 When starting work on a task, check `docs/` for existing documentation that may provide relevant context.
+
+## Conventions
+
+- **System integrations:** Prefer shelling out to CLI tools (e.g., `tailscale status --json`) over library crates when the CLI is universally available. The Mac App Store version of Tailscale does not expose a Unix socket.
+- **UI theme:** Catppuccin Mocha palette (`#1e1e2e` background, `#cdd6f4` foreground).
+- **New Tauri commands:** Create a module in `src-tauri/src/`, add `mod` in `lib.rs`, register in `generate_handler![]`.
+- **Components:** Reusable UI goes in `src/lib/components/`.
 
 ## Maintaining This File
 
