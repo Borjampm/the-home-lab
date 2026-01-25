@@ -11,6 +11,7 @@ A desktop app for managing home lab systems. Displays Tailscale network status a
 - [guides/](guides/) — Step-by-step guides for setup and operations
 - [architecture.md](architecture.md) — High-level system design, data flow, and technology decisions
 - [components/](components/) — Component documentation (Terminal, Tailscale)
+- [design/](design/) — Visual design system (NASA Mission Control aesthetic)
 
 ## Quick Reference
 

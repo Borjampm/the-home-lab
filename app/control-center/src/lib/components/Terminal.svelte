@@ -9,6 +9,13 @@
 
   export let terminalId: string;
   export let command: string | undefined = undefined;
+  // themeColor is passed but only used by parent for chrome styling
+  // Terminal text always uses amber for readability
+  export let themeColor: string = '#FFAA00';
+
+  // Fixed amber color for terminal text - ensures readability regardless of device color
+  const TERMINAL_AMBER = '#FFAA00';
+  const TERMINAL_BG = '#0a0a0a';
 
   let terminalEl: HTMLDivElement;
   let term: Terminal;
@@ -19,14 +26,18 @@
     | { event: 'exit'; data: number };
 
   onMount(async () => {
+    // Always use amber text on near-black background for maximum readability
+    // Device color is used for chrome (border, header) not terminal content
     term = new Terminal({
       cursorBlink: true,
       fontSize: 14,
       fontFamily: 'Menlo, Monaco, "Courier New", monospace',
       theme: {
-        background: '#1e1e2e',
-        foreground: '#cdd6f4',
-        cursor: '#f5e0dc',
+        background: TERMINAL_BG,
+        foreground: TERMINAL_AMBER,
+        cursor: TERMINAL_AMBER,
+        cursorAccent: TERMINAL_BG,
+        selectionBackground: `${TERMINAL_AMBER}40`,
       },
     });
 
