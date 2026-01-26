@@ -1,3 +1,4 @@
+mod sftp;
 mod tailscale;
 
 use portable_pty::{native_pty_system, CommandBuilder, MasterPty, PtySize};
@@ -113,9 +114,13 @@ async fn kill_pty(state: State<'_, PtyState>, terminal_id: String) -> Result<(),
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_clipboard_manager::init())
+        .plugin(tauri_plugin_dialog::init())
+        .plugin(tauri_plugin_fs::init())
         .manage(PtyState {
             sessions: Arc::new(Mutex::new(HashMap::new())),
         })
+        .manage(sftp::SftpState::default())
         .invoke_handler(tauri::generate_handler![
             spawn_shell,
             write_to_pty,
@@ -123,7 +128,25 @@ pub fn run() {
             kill_pty,
             tailscale::get_tailscale_status,
             tailscale::tailscale_up,
-            tailscale::tailscale_down
+            tailscale::tailscale_down,
+            sftp::sftp_connect,
+            sftp::sftp_disconnect,
+            sftp::sftp_list_dir,
+            sftp::sftp_mkdir,
+            sftp::sftp_read_file,
+            sftp::sftp_delete,
+            sftp::sftp_rename,
+            sftp::sftp_download,
+            sftp::sftp_upload,
+            sftp::sftp_cancel_transfer,
+            sftp::sftp_get_bookmarks,
+            sftp::sftp_save_bookmark,
+            sftp::sftp_delete_bookmark,
+            sftp::local_list_dir,
+            sftp::local_read_file,
+            sftp::local_mkdir,
+            sftp::local_delete,
+            sftp::local_rename
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

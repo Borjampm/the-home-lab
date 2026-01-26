@@ -63,6 +63,19 @@
     });
   }
 
+  function openFileBrowser(device: TailscaleDevice, color: string) {
+    const label = `browser-${Date.now()}`;
+    const ip = device.isSelf ? 'self' : device.ips[0];
+    new WebviewWindow(label, {
+      url: `/browser?id=${label}&device=${ip}&host=${encodeURIComponent(device.hostname)}&color=${encodeURIComponent(color)}`,
+      title: `${device.hostname} - Files`,
+      width: 900,
+      height: 600,
+      resizable: true,
+      center: true,
+    });
+  }
+
   async function toggleTailscale() {
     if (!status) return;
     toggling = true;
@@ -150,8 +163,11 @@
                 <span class="relay">RELAY: {device.relay.toUpperCase()}</span>
               {/if}
               {#if device.online}
+                <button class="btn btn-files" style="--device-color: {color}" on:click={() => openFileBrowser(device, color)}>
+                  FILES
+                </button>
                 <button class="btn btn-control" style="--device-color: {color}" on:click={() => takeControl(device, color)}>
-                  TAKE CONTROL
+                  TERMINAL
                 </button>
               {/if}
             </div>
@@ -413,8 +429,8 @@
     color: #666666;
   }
 
+  .btn-files,
   .btn-control {
-    margin-left: auto;
     padding: 4px 12px;
     font-size: 10px;
     background: rgba(0, 0, 0, 0.5);
@@ -423,6 +439,11 @@
     text-shadow: 0 0 8px color-mix(in srgb, var(--device-color, #FFAA00) 40%, transparent);
   }
 
+  .btn-files {
+    margin-left: auto;
+  }
+
+  .btn-files:hover,
   .btn-control:hover {
     background: color-mix(in srgb, var(--device-color, #FFAA00) 20%, transparent);
   }
