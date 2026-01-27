@@ -63,6 +63,7 @@
 
   function handleContextMenu(e: MouseEvent) {
     e.preventDefault();
+    e.stopPropagation();
     dispatch('contextmenu', { file, x: e.clientX, y: e.clientY });
   }
 

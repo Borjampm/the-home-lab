@@ -632,6 +632,7 @@
     if (target.closest('.file-item')) return;
 
     e.preventDefault();
+    e.stopPropagation();
     contextMenuFile = null;
     contextMenuX = e.clientX;
     contextMenuY = e.clientY;
