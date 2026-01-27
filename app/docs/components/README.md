@@ -4,10 +4,11 @@ Documentation for Control Center components — the functional subsystems that m
 
 ## Overview
 
-The Control Center is composed of two main components that handle distinct responsibilities:
+The Control Center is composed of three main components that handle distinct responsibilities:
 
 - **Terminal** — Interactive shell emulator embedded in the desktop app
 - **Tailscale** — Network management integration via CLI
+- **File Browser** — SFTP-based file management for remote and local devices
 
 Each component operates independently and exposes commands to the frontend via Tauri's IPC layer.
 
@@ -15,6 +16,7 @@ Each component operates independently and exposes commands to the frontend via T
 
 - [terminal.md](terminal.md) — PTY-based terminal emulator with bidirectional streaming
 - [tailscale.md](tailscale.md) — Tailscale VPN status monitoring and connection management
+- [file-browser.md](file-browser.md) — SFTP file browser with dual-pane view, transfers, and bookmarks
 
 ## Architecture Context
 

@@ -2,14 +2,15 @@
 
 ## Overview
 
-The Control Center is a Tauri 2 desktop application that provides network monitoring and terminal access for home lab systems. The app combines a dashboard view showing Tailscale network status with a toggleable terminal emulator. Both features are backed by Rust commands invoked from a SvelteKit frontend.
+The Control Center is a Tauri 2 desktop application that provides network monitoring, terminal access, and file management for home lab systems. The app combines a dashboard view showing Tailscale network status with a toggleable terminal emulator and an SFTP-based file browser. All features are backed by Rust commands invoked from a SvelteKit frontend.
 
 ## Core Systems
 
-The application is built around two independent components:
+The application is built around three independent components:
 
 - **Tailscale Integration** — Monitors VPN network status and manages connections via CLI integration
 - **Terminal Emulator** — Provides an embedded interactive shell using PTY-based process management
+- **File Browser** — Enables file browsing and transfers over SFTP to remote devices
 
 For detailed documentation on each component, see [components/](components/).
 
@@ -35,6 +36,24 @@ User toggles connection → invoke('tailscale_up' | 'tailscale_down') → Rust s
 
 See [components/tailscale.md](components/tailscale.md) for details on CLI integration and why this approach was chosen over library crates.
 
+### SFTP Data Flow
+```
+Browser opens → invoke('sftp_connect', { deviceIp }) → russh SSH connect → Authenticate
+  → Open SFTP subsystem → Store session in SftpState
+
+Navigate to directory → invoke('sftp_list_dir', { deviceIp, path })
+  → Lookup connection → sftp.read_dir() → Return DirectoryListing → Render FileList
+
+Download file → invoke('sftp_download', { ..., onProgress }) → Register CancellationToken
+  → sftp.open() → Read 64KB chunks → Channel<TransferEvent>::send(Progress)
+  → Write to local file → send(Complete) → Update TransferQueue
+
+Upload file → invoke('sftp_upload', { ..., onProgress }) → Same pattern as download
+  → Local file → sftp.create() → Write chunks with progress → Complete
+```
+
+See [components/file-browser.md](components/file-browser.md) for details on russh integration, authentication, and feature breakdown.
+
 ## Key Design Decisions
 
 ### Tauri over Electron
@@ -58,6 +77,9 @@ Tauri's Channel API provides ordered, high-throughput data transfer from the PTY
 ### Dashboard-Terminal Toggle Pattern
 The app presents either the dashboard or terminal in fullscreen, toggled via a button. This keeps the UI simple and focused, avoiding split-pane complexity. The terminal is ephemeral — switching back to the dashboard leaves the shell running in the background until the app closes.
 
+### Pure Rust SSH/SFTP via russh
+The file browser uses `russh` and `russh-sftp` crates rather than shelling out to `scp`/`sftp` CLI tools or linking against system OpenSSH libraries. This provides a consistent implementation across platforms without external binary dependencies. The async-native design integrates naturally with Tauri's command model, enabling non-blocking file transfers with real-time progress streaming via Channels.
+
 ## Capabilities
 
 The Control Center can:
@@ -65,17 +87,25 @@ The Control Center can:
 - Connect/disconnect from the Tailscale network
 - Spawn an interactive shell session in a terminal emulator
 - Handle terminal resizing and streaming I/O
-- Present network status and terminal access in a unified interface
+- Browse files on remote devices via SFTP
+- Transfer files between local and remote machines with progress tracking
+- Preview text files without downloading
+- Open terminal sessions at specific directory locations
+- Present network status, terminal, and file management in a unified interface
 
 ## Dependencies
 
 ### External
 - **Tailscale CLI** — Must be installed and available in PATH for network management features
 - **User's shell** — Reads `$SHELL` environment variable, defaults to `/bin/bash` if unset
+- **SSH Agent** — Optional but recommended for key-based authentication to remote devices
 
 ### Rust Crates
 - **portable-pty** — PTY process management
 - **tauri** — Desktop app framework and IPC
+- **russh** — SSH client protocol implementation
+- **russh-sftp** — SFTP protocol layer
+- **tokio** — Async runtime for non-blocking I/O
 
 ### Frontend
 - **SvelteKit** — UI framework (static adapter, no SSR)
@@ -85,3 +115,4 @@ The Control Center can:
 
 - [components/terminal.md](components/terminal.md) — Terminal emulator implementation details
 - [components/tailscale.md](components/tailscale.md) — Tailscale integration implementation details
+- [components/file-browser.md](components/file-browser.md) — SFTP file browser implementation details
