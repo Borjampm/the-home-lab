@@ -42,11 +42,12 @@ Replace `YOUR_USERNAME` with your actual Linux username.
 
 ## Step 2: Access the Server's Syncthing Web UI
 
-Since Ubuntu Server has no desktop environment, access the web UI from your computer using an SSH tunnel:
+Since Ubuntu Server has no desktop environment, access the web UI from your computer using an SSH tunnel. Run in your computer's terminal:
 
 ```bash
 ssh -L 8384:localhost:8384 YOUR_USERNAME@100.x.y.z
 ```
+Where 8384 is the port of the Syncthing web UI and 100.x.y.z is the tailscale IP of the server.
 
 Then open **http://localhost:8384** in your computer's browser.
 
@@ -158,7 +159,7 @@ Add:
 .obsidian/workspace-mobile.json
 ```
 
-Save and exit. Syncthing will pick this up automatically. This file will sync to the other devices.
+Save and exit. Syncthing will pick this up automatically. This file will not be synced to the other devices, so you need to create it manually on each device.
 
 ---
 
