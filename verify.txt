@@ -1,8 +1,0 @@
-Y. Open file browser for local device (self)                                                                                                           
-Y. Open file browser for remote device via Tailscale                                                                                                   
-N. Navigate directories, verify listing works                                                                                                          
-4. Create folder, rename, delete                                                                                                                       
-5. Upload file via dialog, verify progress                                                                                                             
-6. Download file, verify progress                                                                                                                      
-7. Start large transfer, cancel mid-transfer (should be instant now)                                                                                   
-8. Quick Look a text file 
