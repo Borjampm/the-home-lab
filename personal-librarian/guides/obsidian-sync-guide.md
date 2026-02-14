@@ -159,7 +159,7 @@ Add:
 .obsidian/workspace-mobile.json
 ```
 
-Save and exit. Syncthing will pick this up automatically. This file will not be synced to the other devices, so you need to create it manually on each device.
+Save and exit. Syncthing will pick this up automatically. This file will sync to the other devices.
 
 ---
 
