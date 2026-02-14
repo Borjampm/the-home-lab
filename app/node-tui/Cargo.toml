@@ -1,0 +1,15 @@
+[package]
+name = "node-tui"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+ratatui = "0.30"
+tonic = "0.14"
+tonic-prost = "0.14"
+prost = "0.14"
+tokio = { version = "1", features = ["macros", "rt-multi-thread", "time"] }
+color-eyre = "0.6"
+
+[build-dependencies]
+tonic-prost-build = "0.14"

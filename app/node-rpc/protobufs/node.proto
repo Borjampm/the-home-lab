@@ -1,0 +1,15 @@
+syntax = "proto3";
+package node;
+
+service NodeMonitor {
+  rpc StreamCpu (CpuRequest) returns (stream CpuReply);
+}
+
+message CpuRequest {
+  uint64 refresh_ms = 1;
+}
+
+message CpuReply {
+  uint64 cpu_count = 1;
+  float total_usage = 2;
+}
